@@ -66,6 +66,72 @@
   backdrop-filter: blur(6px);
 }
 
+.password-box {
+  position: relative;
+}
+
+.password-box input {
+  width: 100%;
+  padding: 12px;
+  padding-left: 40px;
+}
+
+.toggle-pass {
+  cursor: pointer;
+  user-select: none; /* يمنع التحديد */
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: #94a3b8;
+}
+
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0f172a;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255,255,255,0.2);
+  border-top: 4px solid #38bdf8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: auto;
+  margin-bottom: 20px;
+}
+
+#loadingText {
+  margin-bottom: 10px;
+  color: #38bdf8;
+}
+
+#loadingCount {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.toggle-pass:hover {
+  color: #38bdf8;
+}
+
+
   /* glowing border */
   .form-box::before {
     content: "";
@@ -81,11 +147,12 @@
     transform: scale(0.95);
   }
 
-  .login-note {
-    margin-top: 15px;
-    font-size: 13px;
-    color: #aaa;
-  }
+.login-note {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #38bdf8;
+}
 
   /* الفورم */
   .form-box {

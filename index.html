@@ -5,7 +5,7 @@
   <title>منصة المتمكن</title>
   <link rel="stylesheet" href="style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
 <style>
   body {
   margin: 0;
@@ -118,14 +118,28 @@ nav button {
   <div id="login" class="modal">
   <div class="form-box">
     <span class="close-btn" onclick="closeLogin()">×</span>
-    <h2>تسجيل الدخول</h2>
+    <h2>🔐 تسجيل الدخول</h2>
 
-    <input id="loginUsername" placeholder="اسم المستخدم">
-    <input id="loginPassword" type="password" placeholder="كلمة المرور">
-    
-    <button onclick="login()">دخول</button> 
+<div class="input-group">
+  <input id="loginUsername" placeholder=" ">
+  <label>اسم المستخدم</label>
+</div>
 
-    </p>
+<div class="input-group password-box">
+  <input id="loginPassword" type="password" placeholder=" ">
+  <label>كلمة المرور</label>
+  <span class="toggle-pass" onclick="togglePassword()">👁️‍🗨️</span>
+</div>
+
+<button id="loginBtn" onclick="login()">
+  <span id="btnText">دخول</span>
+  <span id="loader" class="loader"></span>
+</button>
+
+<p class="login-note">
+  <span id="noteText">ابدأ رحلتك مع المتمكن 🚀</span>
+  <span id="countdown"></span>
+</p>
   </div>
 </div>
 
@@ -138,9 +152,28 @@ nav button {
 function closeLogin() {
   document.getElementById("login").style.display = "none";
 }
+
+function togglePassword() {
+  const input = document.getElementById("loginPassword");
+
+  if (input.type === "password") {
+    input.type = "text";
+  } else {
+    input.type = "password";
+  }
+}
+
 </script>
 
   <script type="module" src="script.js"></script>
+
+<div id="loadingScreen" class="loading-screen">
+  <div class="loading-content">
+    <div class="spinner"></div>
+    <h2 id="loadingText">اهلا بيك مع المتمكن 🚀</h2>
+    <p id="loadingCount">5</p>
+  </div>
+</div>
 </body>
 
 
