@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Dashboard</title>
+
+<style>
+body{margin:0;font-family:Cairo;background:#020617;color:#22d3ee}
+nav{display:flex;gap:10px;background:#020617;padding:10px}
+nav button{padding:10px;background:#22d3ee;border:none;cursor:pointer}
+.section{display:none;padding:20px}
+.active{display:block}
+.card{background:#020617;border:1px solid #22d3ee;padding:15px;margin:10px 0}
+input,select,textarea{width:100%;padding:8px;margin:5px 0}
+button{padding:8px;margin-top:5px}
+.video{border:1px solid #22d3ee;padding:10px;margin:10px 0}
+.section-card{
+  background: rgba(2,6,23,0.7);
+  border: 1px solid #22d3ee;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.grid-2{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.title{
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #22d3ee;
+}
+
+.btn-main{
+  background:#22d3ee;
+  color:#020617;
+  border:none;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.btn-danger{
+  background:#ef4444;
+  color:white;
+}
+
+.btn-edit{
+  background:#eab308;
+  color:black;
+}
+
+.card:hover{
+  transform: scale(1.02);
+  transition:0.3s;
+}
+</style>
+</head>
+
+<body>
+
+<div id="toast" style="
+position:fixed;
+bottom:20px;
+right:20px;
+background:#22c55e;
+color:white;
+padding:15px 25px;
+border-radius:10px;
+z-index:9999;
+font-weight:bold;
+opacity:0;
+transform:translateY(20px);
+transition: all 0.4s ease;
+pointer-events:none;
+">
+✔️ تم بنجاح
+</div>
+
+<nav>
+<button onclick="show('videos')">🎥 فيديوهات</button>
+<button onclick="show('exams')">📝 امتحانات</button>
+<button onclick="show('students')">👥 طلاب</button>
+<button onclick="show('archive')">📦 أرشيف</button>
+<button onclick="show('notify')">🔔 إشعارات</button>
+<button onclick="show('groups')">⚙️ الصفوف</button>
+</nav>
+
+<!-- 🎥 VIDEOS -->
+<div id="videos" class="section active">
+<h2>رفع فيديو</h2>
+
+<input id="videoName" placeholder="اسم الفيديو">
+
+<select id="videoClass"></select>
+<div id="groupCheckboxes"></div>
+
+<label>
+  <input type="checkbox" id="allGroups"> لكل المجموعات
+</label>
+
+<input type="file" id="videoFile">
+<button onclick="uploadVideo()">Upload</button>
+
+<h3>الفيديوهات</h3>
+<div id="videoList"></div>
+</div>
+<div id="videoDetails"></div>
+
+<!-- 📝 EXAMS -->
+<div id="exams" class="section">
+
+  <div class="section-card">
+    <div class="title">📝 إنشاء امتحان</div>
+
+    <div class="grid-2">
+      <input id="examName" placeholder="اسم الامتحان">
+      <select id="examClass"></select>
+      <div id="examGroupCheckboxes"></div>
+
+<label>
+  <input type="checkbox" id="examAllGroups"> لكل المجموعات
+</label>
+    </div>
+
+    <div id="questions"></div>
+
+    <button class="btn-main" onclick="addQuestion()">➕ إضافة سؤال</button>
+    <button class="btn-main" onclick="saveExam()">💾 حفظ الامتحان</button>
+  </div>
+
+  <div class="section-card">
+    <div class="title">📊 الامتحانات</div>
+    <div id="examList"></div>
+  </div>
+
+  <div id="resultsBox" class="section-card"></div>
+
+</div>
+
+<!-- 👥 STUDENTS -->
+<div id="students" class="section">
+<h2>إضافة طالب</h2>
+
+<input id="studentName" placeholder="اسم الطالب">
+<input id="studentAddress" placeholder="العنوان">
+<input id="parentPhone" placeholder="رقم ولي الأمر">
+<input id="studentPhone" placeholder="رقم الطالب">
+
+<input id="studentId" placeholder="ID">
+<input id="studentPass" placeholder="Password">
+
+<select id="studentClass"></select>
+<select id="studentGroup"></select>
+
+<button onclick="addStudent()">إضافة</button>
+
+<h3>الطلاب</h3>
+<input id="searchStudent" placeholder="🔍 ابحث عن طالب..." onkeyup="searchStudent()">
+<div id="studentList"></div>
+</div>
+
+<div id="archive" class="section">
+<h2>📦 أرشيف الطلاب</h2>
+<div id="archiveList"></div>
+</div>
+
+<!-- 🔔 NOTIFICATIONS -->
+<div id="notify" class="section">
+
+  <div class="section-card">
+
+    <div class="title">🔔 إرسال إشعار</div>
+
+    <textarea id="noteText" placeholder="اكتب الإشعار..."></textarea>
+
+    <div class="grid-2">
+      <select id="noteClass"></select>
+      <div id="noteGroupCheckboxes"></div>
+
+<label>
+  <input type="checkbox" id="noteAllGroups"> لكل المجموعات
+</label>
+    </div>
+
+    <button class="btn-main" onclick="sendNote()">🚀 إرسال</button>
+
+  </div>
+
+</div>
+
+<!-- ⚙️ GROUPS -->
+<div id="groups" class="section">
+<input id="newClass" placeholder="صف">
+<input id="newGroup" placeholder="مجموعة">
+
+<button onclick="addGroup()">إضافة</button>
+<button onclick="deleteClass()">حذف صف</button>
+<button onclick="deleteGroup()">حذف مجموعة</button>
+<button onclick="editGroup()">تعديل مجموعة</button>
+</div>
+
+<script type="module">
+
+import { db } from "./firebase-db.js";
+import { collection, addDoc, getDocs, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+function showToast(msg){
+
+  let toast = document.getElementById("toast");
+
+  toast.innerText = msg;
+
+  // 🔥 يظهر
+  toast.style.opacity = "1";
+  toast.style.transform = "translateY(0)";
+
+  // 🔥 يختفي
+  setTimeout(()=>{
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(20px)";
+  },2500);
+}
+
+window.show = (id)=>{
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+};
+
+// 🎥 VIDEO
+window.uploadVideo = async ()=>{
+
+  let file = document.getElementById("videoFile").files[0];
+  let name = document.getElementById("videoName").value;
+
+  let videoClass = document.getElementById("videoClass").value;
+  let selectedGroups = [...document.querySelectorAll(".groupCheck:checked")]
+  .map(cb=>cb.value);
+  let all = document.getElementById("allGroups").checked;
+
+  if(!name || !file){
+  alert("اكتب اسم الفيديو واختار ملف ❗");
+  return;
+}
+
+if(!all && selectedGroups.length === 0){
+  showToast("اختار مجموعة أو فعل كل المجموعات ❗");
+  return;
+}
+
+  try{
+    await addDoc(collection(db,"videos"),{
+      name,
+      fileName: file.name,
+      class: videoClass,
+      groups: all ? ["ALL"] : selectedGroups, // 🔥 ARRAY
+      videoId: Date.now().toString(),
+      createdAt: new Date()
+    });
+    alert("تم الرفع ✅");
+    loadVideos();
+
+  }catch(err){
+    console.error(err);
+    alert("في مشكلة ❌");
+  }
+};
+
+window.saveExam = async ()=>{
+
+  let name = document.getElementById("examName").value;
+  let examClass = document.getElementById("examClass").value;
+
+  let selectedGroups = [...document.querySelectorAll("#examGroupCheckboxes input:checked")]
+  .map(cb=>cb.value);
+
+  let all = document.getElementById("examAllGroups").checked;
+
+  if(!name){
+    showToast("اكتب اسم الامتحان ❗");
+    return;
+  }
+
+  if(!all && selectedGroups.length === 0){
+    showToast("اختار مجموعة ❗");
+    return;
+  }
+
+  let questions = [];
+
+  document.querySelectorAll(".question").forEach(q=>{
+
+    let text = q.querySelector(".q-text").value;
+    let degree = q.querySelector(".degree").value;
+
+    let choicesBox = q.querySelector(".choices");
+
+    if(choicesBox){
+      let choices = [...choicesBox.querySelectorAll("input")].map(i=>i.value);
+      let correct = choicesBox.querySelector(".correct").value;
+
+      questions.push({
+        type:"mcq",
+        text,
+        choices,
+        correct,
+        degree
+      });
+
+    }else{
+      questions.push({
+        type:"essay",
+        text,
+        degree
+      });
+    }
+
+  });
+
+  await addDoc(collection(db,"exams"),{
+    name,
+    class: examClass,
+    groups: all ? ["ALL"] : selectedGroups,
+    questions,
+    createdAt: new Date()
+  });
+
+  showToast("تم حفظ الامتحان 💾🔥");
+};
+
+window.loadArchive = ()=>{
+  onSnapshot(collection(db,"archive_students"), (snapshot)=>{
+
+    let div = document.getElementById("archiveList");
+    div.innerHTML="";
+
+    snapshot.forEach(s=>{
+      let d = s.data();
+
+      div.innerHTML+=`
+      <div class="card">
+        👤 ${d.name}<br>
+        ID: ${d.id}<br>
+        الصف: ${d.class}<br>
+        المجموعة: ${d.group}<br>
+
+        <button onclick="restoreStudent('${s.id}')">♻️ استعادة</button>
+        <button onclick="deleteArchive('${s.id}')">🗑 حذف نهائي</button>
+      </div>`;
+    });
+
+  });
+};
+
+window.restoreStudent = async(id)=>{
+
+  let data = await getDocs(collection(db,"archive_students"));
+
+  data.forEach(async(s)=>{
+    if(s.id === id){
+
+      let d = s.data();
+
+      await addDoc(collection(db,"students"), d);
+      await deleteDoc(doc(db,"archive_students",id));
+    }
+  });
+
+  showToast("تم استعادة الطالب ♻️");
+};
+
+window.deleteArchive = async(id)=>{
+  await deleteDoc(doc(db,"archive_students",id));
+  showToast("تم الحذف النهائي 🗑");
+};
+
+window.loadGroups = ()=>{
+  onSnapshot(collection(db,"groups"), (snapshot)=>{
+
+    let classSet = new Set();
+    let groupSet = new Set();
+
+    snapshot.forEach(d=>{
+      classSet.add(d.data().c);
+      groupSet.add(d.data().g);
+    });
+
+    // 🟢 الصفوف (زي ما هي select)
+    let classSelects = ["videoClass","studentClass","noteClass","examClass"];
+
+    classSelects.forEach(id=>{
+      let el = document.getElementById(id);
+      if(el) el.innerHTML="";
+    });
+
+    classSet.forEach(c=>{
+      classSelects.forEach(id=>{
+        let el = document.getElementById(id);
+        if(el) el.innerHTML += `<option>${c}</option>`;
+      });
+    });
+
+    // 🟢 المجاميع (لباقي السيستم select عادي)
+    let normalGroupSelects = ["studentGroup","noteGroup","examGroup"];
+
+    normalGroupSelects.forEach(id=>{
+      let el = document.getElementById(id);
+      if(el) el.innerHTML="";
+    });
+
+    groupSet.forEach(g=>{
+      normalGroupSelects.forEach(id=>{
+        let el = document.getElementById(id);
+        if(el) el.innerHTML += `<option>${g}</option>`;
+      });
+    });
+
+    // 🔥 فيديوهات
+let videoBox = document.getElementById("groupCheckboxes");
+
+// 🔥 امتحانات
+let examBox = document.getElementById("examGroupCheckboxes");
+
+// 🔥 إشعارات
+let noteBox = document.getElementById("noteGroupCheckboxes");
+
+[videoBox, examBox, noteBox].forEach(box=>{
+  if(box){
+    box.innerHTML = "";
+
+    groupSet.forEach(g=>{
+      box.innerHTML += `
+        <label style="display:block;margin:5px 0">
+          <input type="checkbox" value="${g}" class="groupCheck">
+          ${g}
+        </label>
+      `;
+    });
+  }
+});
+
+  });
+};
+
+window.loadVideos = ()=>{
+  onSnapshot(collection(db,"videos"), (snapshot)=>{
+
+    let div = document.getElementById("videoList");
+    div.innerHTML="";
+
+    snapshot.forEach(v=>{
+      let d=v.data();
+
+      div.innerHTML+=`
+      <div class="video">
+        <b>${d.name}</b><br>
+        الصف: ${d.class} <br>
+        المجموعة: ${d.groups ? d.groups.join(", ") : "-"} <br>
+
+        <button onclick="openVideo('${d.videoId}','${d.name}')">📊 تفاصيل</button>
+        <button onclick="editVideo('${v.id}','${d.name}')">✏️ تعديل</button>
+        <button onclick="deleteVideo('${v.id}')">🗑 حذف</button>
+      </div>`;
+    });
+
+  });
+};
+
+window.deleteVideo = async(id)=>{
+  await deleteDoc(doc(db,"videos",id));
+  loadVideos();
+};
+
+window.editVideo = async(id, oldName)=>{
+
+  let newName = prompt("اسم الفيديو الجديد", oldName);
+
+  let newGroup = prompt("اكتب المجموعات مفصولة بفاصلة (A,B,C)");
+
+  if(!newName) return;
+
+  let groupsArray = newGroup ? newGroup.split(",") : [];
+
+  await updateDoc(doc(db,"videos",id),{
+    name:newName,
+    groups: groupsArray.length ? groupsArray : ["ALL"]
+  });
+
+  showToast("تم تعديل الفيديو ✏️");
+};
+
+// 📝 EXAM
+window.addQuestion = ()=>{
+
+  let div = document.getElementById("questions");
+
+  div.innerHTML += `
+  <div class="card question">
+
+    <input class="q-text" placeholder="السؤال">
+
+    <div class="choices">
+      <input placeholder="اختيار 1">
+      <input placeholder="اختيار 2">
+      <input placeholder="اختيار 3">
+      <input placeholder="اختيار 4">
+
+      <select class="correct">
+        <option value="0">صح 1</option>
+        <option value="1">صح 2</option>
+        <option value="2">صح 3</option>
+        <option value="3">صح 4</option>
+      </select>
+    </div>
+
+    <label>درجة السؤال</label>
+    <input type="number" class="degree" placeholder="درجة السؤال">
+
+    <button onclick="toggleType(this)">🔄 تحويل</button>
+    <button onclick="removeQuestion(this)">❌ حذف</button>
+
+  </div>`;
+};
+
+window.removeQuestion = (btn)=>{
+  btn.parentElement.remove();
+};
+
+window.toggleType = (btn)=>{
+
+  let card = btn.parentElement;
+
+  let textEl = card.querySelector(".q-text");
+
+  if(!textEl) return; // 🔥 حماية من error
+
+  let isEssay = textEl.classList.contains("essay");
+
+  // 🟢 مقالي → اختياري
+  if(isEssay){
+
+    textEl.outerHTML = `<input class="q-text" placeholder="السؤال">`;
+
+    // امنع التكرار
+    if(!card.querySelector(".choices")){
+      card.insertAdjacentHTML("beforeend", `
+        <div class="choices">
+          <input placeholder="اختيار 1">
+          <input placeholder="اختيار 2">
+          <input placeholder="اختيار 3">
+          <input placeholder="اختيار 4">
+
+          <select class="correct">
+            <option value="0">صح 1</option>
+            <option value="1">صح 2</option>
+            <option value="2">صح 3</option>
+            <option value="3">صح 4</option>
+          </select>
+        </div>
+      `);
+    }
+
+  }else{
+
+    // 🔴 اختياري → مقالي
+    let choices = card.querySelector(".choices");
+    if(choices) choices.remove();
+
+    textEl.outerHTML = `
+      <textarea class="q-text essay" placeholder="اكتب السؤال المقالي"></textarea>
+    `;
+  }
+};
+
+window.loadExams = ()=>{
+  onSnapshot(collection(db,"exams"), (snapshot)=>{
+
+    let div = document.getElementById("examList");
+    div.innerHTML="";
+
+    snapshot.forEach(e=>{
+
+      let d = e.data();
+
+      div.innerHTML += `
+      <div class="card">
+        <h3>📝 ${d.name}</h3>
+
+        <p>📚 الصف: ${d.class}</p>
+        <p>👥 المجموعات: ${d.groups ? d.groups.join(", ") : "-"}</p>
+
+        <div style="margin-top:10px">
+          <button class="btn-main" onclick="openExam('${e.id}')">📊 عرض</button>
+          <button class="btn-danger" onclick="deleteExam('${e.id}')">🗑 حذف</button>
+        </div>
+      </div>
+      `;
+      
+    });
+
+  });
+};
+
+window.deleteExam = async(id)=>{
+
+  let confirmDelete = confirm("متأكد عايز تحذف الامتحان؟");
+
+  if(!confirmDelete) return;
+
+  await deleteDoc(doc(db,"exams",id));
+
+  showToast("تم حذف الامتحان 🗑");
+};
+
+window.openExam = (examId)=>{
+
+  onSnapshot(collection(db,"results"), async(snapshot)=>{
+
+    let arr = [];
+
+    snapshot.forEach(r=>{
+      let d = r.data();
+      if(d.examId === examId){
+        arr.push({...d, id:r.id});
+      }
+    });
+
+    // 🔥 ترتيب
+    arr.sort((a,b)=> (b.total || 0) - (a.total || 0));
+
+    let div = document.getElementById("resultsBox");
+    div.innerHTML = "<h2>📊 النتائج</h2>";
+
+    arr.forEach((s,i)=>{
+      div.innerHTML += `
+      <div class="card">
+        🏆 #${i+1} <br>
+        👤 ${s.studentId} <br>
+        MCQ: ${s.score || 0} <br>
+        Essay: ${s.essayScore || 0} <br>
+        Total: ${s.total || 0}
+        
+        ${s.essayScore === undefined ? 
+          `<button onclick="correctEssay('${s.id}')">✍️ تصحيح</button>` 
+          : ""
+        }
+      </div>`;
+    });
+
+  });
+
+};
+
+function filterGroup(arr, group){
+  return arr.filter(s => s.group === group);
+}
+
+function calcMCQScore(questions, answers){
+
+  let score = 0;
+
+  questions.forEach((q,i)=>{
+    if(q.type === "mcq"){
+      if(Number(q.correct) === Number(answers[i])){
+        score += Number(q.degree);
+      }
+    }
+  });
+
+  return score;
+}
+
+window.getAbsent = async(examId)=>{
+
+  let students = await getDocs(collection(db,"students"));
+  let results = await getDocs(collection(db,"results"));
+
+  let done = [];
+
+  results.forEach(r=>{
+    if(r.data().examId === examId){
+      done.push(r.data().studentId);
+    }
+  });
+
+  students.forEach(s=>{
+    if(!done.includes(s.data().id)){
+      console.log("لم يدخل:", s.data().name);
+    }
+  });
+};
+
+window.correctEssay = async(resultId)=>{
+
+  let newEssay = Number(prompt("ادخل درجة السؤال المقالي"));
+
+  if(isNaN(newEssay)){
+    showToast("ادخل رقم صحيح ❗");
+    return;
+  }
+
+  let data = await getDocs(collection(db,"results"));
+
+  data.forEach(async(r)=>{
+    if(r.id === resultId){
+
+      let d = r.data();
+
+      let total = (d.score || 0) + newEssay;
+
+      await updateDoc(doc(db,"results",resultId),{
+        essayScore: newEssay,
+        total: total
+      });
+
+    }
+  });
+
+  showToast("تم التصحيح وحساب الإجمالي 🔥");
+};
+
+window.filterGroup = (group)=>{
+  // فلترة results حسب group
+};
+
+window.addStudent = async ()=>{
+
+  let name = document.getElementById("studentName").value;
+  let address = document.getElementById("studentAddress").value;
+  let parentPhone = document.getElementById("parentPhone").value;
+  let studentPhone = document.getElementById("studentPhone").value;
+
+  let id = document.getElementById("studentId").value;
+  let pass = document.getElementById("studentPass").value;
+
+  let c = document.getElementById("studentClass").value;
+  let g = document.getElementById("studentGroup").value;
+
+  // ✅ Validation
+  if(!name || !id || !pass){
+    showToast("اكمل البيانات الأساسية ❗");
+    return;
+  }
+
+  try{
+
+    await addDoc(collection(db,"students"),{
+      name,
+      address,
+      parentPhone,
+      studentPhone,
+      id,
+      pass,
+      class: c,
+      group: g,
+      createdAt: new Date()
+    });
+
+    showToast("تم إضافة الطالب ✅");
+
+    // 🔥 Reset
+    document.getElementById("studentName").value = "";
+    document.getElementById("studentAddress").value = "";
+    document.getElementById("parentPhone").value = "";
+    document.getElementById("studentPhone").value = "";
+    document.getElementById("studentId").value = "";
+    document.getElementById("studentPass").value = "";
+
+  }catch(err){
+    console.error(err);
+    showToast("في مشكلة ❌");
+  }
+};
+
+window.loadStudents = ()=>{
+  onSnapshot(collection(db,"students"), (snapshot)=>{
+
+    let div = document.getElementById("studentList");
+    div.innerHTML="";
+
+    snapshot.forEach(s=>{
+      let d = s.data();
+
+      div.innerHTML+=`
+      <div class="card">
+        👤 <b>${d.name}</b><br>
+        ID: ${d.id}<br>
+        📞 الطالب: ${d.studentPhone || "-"}<br>
+        📞 ولي الأمر: ${d.parentPhone || "-"}<br>
+        📍 ${d.address || "-"}<br>
+        الصف: ${d.class}<br>
+        المجموعة: ${d.group}<br>
+
+        <div style="margin-top:10px">
+
+          <button onclick="editStudent(
+            '${s.id}',
+            '${d.name}',
+            '${d.address}',
+            '${d.studentPhone}',
+            '${d.parentPhone}',
+            '${d.class}',
+            '${d.group}'
+            )">✏️ تعديل</button>
+
+          <button onclick="changePassword('${s.id}')">🔑 باسورد</button>
+
+          <button onclick="archiveStudent('${s.id}')">📦 أرشيف</button>
+
+          <button onclick="deleteStudent('${s.id}')">🗑 حذف</button>
+
+        </div>
+      </div>`;
+    });
+
+  });
+};
+
+window.changePassword = async(id)=>{
+
+  let newPass = prompt("الباسورد الجديد");
+
+  if(!newPass){
+    showToast("اكتب الباسورد ❗");
+    return;
+  }
+
+  await updateDoc(doc(db,"students",id),{
+    pass:newPass
+  });
+
+  showToast("تم تغيير الباسورد 🔑");
+};
+
+window.archiveStudent = async(id)=>{
+
+  let data = await getDocs(collection(db,"students"));
+
+  data.forEach(async(s)=>{
+    if(s.id === id){
+
+      let d = s.data();
+
+      await addDoc(collection(db,"archive_students"), d);
+
+      await deleteDoc(doc(db,"students",id));
+    }
+  });
+
+  showToast("تم نقل الطالب للأرشيف 📦");
+};
+
+window.loadResults = ()=>{
+  onSnapshot(collection(db,"results"), (snapshot)=>{
+
+    snapshot.forEach(r=>{
+      console.log(r.data());
+    });
+
+  });
+};
+
+window.searchStudent = ()=>{
+
+  let val = document.getElementById("searchStudent").value.toLowerCase();
+  let cards = document.querySelectorAll("#studentList .card");
+
+  cards.forEach(c=>{
+    if(c.innerText.toLowerCase().includes(val)){
+      c.style.display = "block";
+    }else{
+      c.style.display = "none";
+    }
+  });
+};
+
+window.editStudent = async(id,name,address,phone,parent,currentClass,currentGroup)=>{
+
+  let newName = prompt("اسم الطالب", name);
+  let newAddress = prompt("العنوان", address);
+  let newPhone = prompt("رقم الطالب", phone);
+  let newParent = prompt("رقم ولي الأمر", parent);
+
+  let newClass = prompt("الصف", currentClass);
+  let newGroup = prompt("المجموعة", currentGroup);
+
+  // ✅ أهم جزء (حل المشكلة)
+  if(!newClass) newClass = currentClass;
+  if(!newGroup) newGroup = currentGroup;
+
+  await updateDoc(doc(db,"students",id),{
+    name:newName || name,
+    address:newAddress || address,
+    studentPhone:newPhone || phone,
+    parentPhone:newParent || parent,
+    class:newClass,
+    group:newGroup
+  });
+
+  showToast("تم التعديل ✅");
+};
+
+window.deleteStudent = async(id)=>{
+  await deleteDoc(doc(db,"students",id));
+  loadStudents();
+};
+
+// 🔔 NOTIFY
+window.sendNote = async ()=>{
+
+  let text = document.getElementById("noteText").value;
+  let c = document.getElementById("noteClass").value;
+  let selectedGroups = [...document.querySelectorAll("#noteGroupCheckboxes input:checked")]
+.map(cb=>cb.value);
+
+let all = document.getElementById("noteAllGroups").checked;
+
+if(!all && selectedGroups.length === 0){
+  showToast("اختار مجموعة ❗");
+  return;
+}
+
+  if(!text){
+    alert("اكتب الإشعار ❗");
+    return;
+  }
+
+  await addDoc(collection(db,"notifications"),{
+    text,
+    class: c,
+    groups: all ? ["ALL"] : selectedGroups,
+    createdAt: new Date()
+  });
+
+  showToast("تم إرسال الإشعار 🔔");
+};
+
+// ⚙️ GROUPS
+window.addGroup = async ()=>{
+
+  let c = document.getElementById("newClass").value;
+  let g = document.getElementById("newGroup").value;
+
+  if(!c || !g){
+    showToast("اكتب الصف والمجموعة ❗");
+    return;
+  }
+
+  try{
+
+    await addDoc(collection(db,"groups"),{c,g});
+
+    showToast("تم إضافة المجموعة ✅");
+
+    // 🔥 تفريغ الفورم
+    document.getElementById("newClass").value = "";
+    document.getElementById("newGroup").value = "";
+
+  }catch(err){
+    console.error(err);
+    showToast("في مشكلة ❌");
+  }
+};
+
+window.deleteClass = async ()=>{
+
+  let c = document.getElementById("newClass").value;
+
+  if(!c){
+    showToast("اكتب الصف الأول ❗");
+    return;
+  }
+
+  let data = await getDocs(collection(db,"groups"));
+
+  data.forEach(async(d)=>{
+    if(d.data().c === c){
+      await deleteDoc(doc(db,"groups",d.id));
+    }
+  });
+
+  showToast("تم حذف الصف ✅");
+};
+
+window.deleteGroup = async ()=>{
+
+  let g = document.getElementById("newGroup").value;
+
+  if(!g){
+    showToast("اكتب المجموعة ❗");
+    return;
+  }
+
+  let data = await getDocs(collection(db,"groups"));
+
+  data.forEach(async(d)=>{
+    if(d.data().g === g){
+      await deleteDoc(doc(db,"groups",d.id));
+    }
+  });
+
+  showToast("تم حذف المجموعة ✅");
+};
+
+window.editGroup = async ()=>{
+
+  let oldGroup = prompt("اكتب اسم المجموعة القديمة");
+  let newGroup = document.getElementById("newGroup").value;
+
+  if(!oldGroup || !newGroup){
+    showToast("اكتب البيانات ❗");
+    return;
+  }
+  
+  let data = await getDocs(collection(db,"groups"));
+
+  data.forEach(async(d)=>{
+    if(d.data().g === oldGroup){
+
+      await deleteDoc(doc(db,"groups",d.id));
+
+      await addDoc(collection(db,"groups"),{
+        c: d.data().c,
+        g: newGroup
+      });
+    }
+  });
+
+  showToast("تم تعديل المجموعة ✅");
+};
+
+window.openVideo = (videoId, name)=>{
+
+  let selectedGroup = prompt("بحث");
+
+  onSnapshot(collection(db,"video_progress"), (snapshot)=>{
+
+    let arr = [];
+
+    snapshot.forEach(v=>{
+      let d = v.data();
+
+      if(d.videoId === videoId){
+
+        if(!selectedGroup || d.group === selectedGroup){
+          arr.push(d);
+        }
+
+      }
+    });
+
+    // ترتيب حسب المشاهدة
+    arr.sort((a,b)=> b.percent - a.percent);
+
+    let div = document.getElementById("videoDetails");
+
+    div.innerHTML = `<h2>📊 تفاصيل: ${name}</h2>`;
+
+    if(arr.length === 0){
+      div.innerHTML += "❌ مفيش حد شاف الفيديو";
+      return;
+    }
+
+    arr.forEach(s=>{
+
+      div.innerHTML += `
+      <div class="card">
+        👤 ${s.studentId}<br>
+        ⏱ ${s.watchedSeconds} ثانية<br>
+        📊 ${s.percent}% 
+      </div>`;
+    });
+
+  });
+};
+loadVideos();
+loadGroups();
+loadStudents();
+loadArchive();
+loadExams();
+</script>
+
+</body>
+</html>

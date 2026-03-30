@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>منصة المتمكن</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+<style>
+  body {
+  margin: 0;
+  font-family: 'Cairo', sans-serif;
+  background: #f5f5f5;
+  direction: rtl;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background: #0a7f5a;
+  color: white;
+}
+
+nav button {
+  margin-left: 10px;
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+  background: white;
+  color: #0a7f5a;
+  border-radius: 5px;
+}
+
+.hero {
+  text-align: center;
+  padding: 100px 20px;
+  background: linear-gradient(#0a7f5a, #045c41);
+  color: white;
+}
+
+.hero button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  border: none;
+  background: white;
+  color: #0a7f5a;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+}
+
+.form-box {
+  background: white;
+  padding: 30px;
+  width: 300px;
+  margin: 100px auto;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.form-box input, select {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+}
+</style>
+
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <h2>المتمكن</h2>
+    <div>
+      <button onclick="showLogin()">تسجيل الدخول</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>ابدأ رحلتك نحو التفوق في الأحياء</h1>
+    <p>مع الأستاذ أسامة كساب</p>
+    <button onclick="showLogin()">ابدأ الآن</button>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <div class="card">🎥 فيديوهات شرح مبسطة</div>
+    <div class="card">📝 امتحانات تفاعلية</div>
+    <div class="card">📊 متابعة مستمرة</div>
+  </section>
+
+  <!-- Login Form -->
+  <div id="login" class="modal">
+  <div class="form-box">
+    <span class="close-btn" onclick="closeLogin()">×</span>
+    <h2>تسجيل الدخول</h2>
+
+    <input id="loginUsername" placeholder="اسم المستخدم">
+    <input id="loginPassword" type="password" placeholder="كلمة المرور">
+    
+    <button onclick="login()">دخول</button> 
+
+    </p>
+  </div>
+</div>
+
+<script>
+  
+  function showLogin() {
+  document.getElementById("login").style.display = "block";
+}
+
+function closeLogin() {
+  document.getElementById("login").style.display = "none";
+}
+</script>
+
+  <script type="module" src="script.js"></script>
+</body>
+
+
+</html>
